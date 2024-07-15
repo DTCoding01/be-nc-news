@@ -1,6 +1,8 @@
 # Northcoders News API
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+To run this project locally you will need to create two .env files: .env.development and .env.test. 
+
+These files will need the following code "PGDATABASE=" followed by the database names which can be found in the setup.sql file. 
 
 
 
