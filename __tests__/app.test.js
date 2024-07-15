@@ -98,8 +98,8 @@ describe("GET /api/articles", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
-      .then(({ body: { rows } }) => {
-        rows.forEach((article) => {
+      .then(({ body: { articles } }) => {
+        articles.forEach((article) => {
           expect(article).toMatchObject({
             article_id: expect.any(Number),
             title: expect.any(String),
@@ -117,8 +117,8 @@ describe("GET /api/articles", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
-      .then(({ body: { rows } }) => {
-        rows.forEach((article) => {
+      .then(({ body: { articles } }) => {
+        articles.forEach((article) => {
           expect(article.hasOwnProperty("body")).toBe(false);
         });
       });
@@ -127,11 +127,58 @@ describe("GET /api/articles", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
-      .then(({ body: { rows } }) => {
-        expect(rows).toBeSortedBy("created_at", {
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at", {
           coearce: true,
           descending: true,
         });
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+  it("Returns an array of comment objects for the chosen article id", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: 1,
+          });
+        });
+      });
+  });
+  it("Returns an array sorted by created_at date", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toBeSortedBy("created_at", {
+          coerce: true,
+          descending: true,
+        });
+      });
+  });
+  it("Responds with an error 404 if an id is entered that does not exist", () => {
+    return request(app)
+      .get("/api/articles/999999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toMatchObject({ msg: "not found" });
+      });
+  });
+  it("Responds with an error 400 if an invalid id is entered", () => {
+    return request(app)
+      .get("/api/articles/NaN/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toMatchObject({ msg: "invalid input" });
       });
   });
 });
