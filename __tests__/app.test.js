@@ -92,3 +92,46 @@ describe("GET /api/articles/:article_id", () => {
       });
   });
 });
+
+describe("GET /api/articles", () => {
+  it("Responds with an array of article objects", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { rows } }) => {
+        rows.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(String),
+          });
+        });
+      });
+  });
+  it("Does not include a body property on any of the objects", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { rows } }) => {
+        rows.forEach((article) => {
+          expect(article.hasOwnProperty("body")).toBe(false);
+        });
+      });
+  });
+  it("Sorts the array by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { rows } }) => {
+        expect(rows).toBeSortedBy("created_at", {
+          coearce: true,
+          descending: true,
+        });
+      });
+  });
+});
