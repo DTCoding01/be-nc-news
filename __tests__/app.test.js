@@ -8,6 +8,7 @@ const {
   topicData,
   userData,
 } = require("../db/data/test-data/index.js");
+const endpoints = require('../endpoints.json')
 
 beforeEach(() => seed({ topicData, userData, articleData, commentData }));
 afterAll(() => db.end());
@@ -34,4 +35,23 @@ describe("GET /api/topics", () => {
         });
       });
   });
+});
+
+describe("GET /api", () => {
+    it("Returns an object", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({body: {response}}) => {
+         expect(typeof response).toBe('object')
+        });
+    })
+    it("Returns the endpoints.json data", () => {
+        return request(app)
+          .get("/api")
+          .expect(200)
+          .then(({body: {response}}) => {
+           expect(response).toEqual(endpoints)
+          });
+      });
 });
