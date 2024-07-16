@@ -134,7 +134,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body: { comments } }) => {
-        expect(comments.length).toBe(11)
+        expect(comments.length).toBe(11);
         comments.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
@@ -205,7 +205,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       {
         invalidKey: "error",
         body: "comment",
-      }
+      },
     ];
     invalidComments.forEach((invalidComment) => {
       return request(app)
@@ -316,7 +316,7 @@ describe("PATCH /api/articles/:article_id", () => {
   it("Returns 400 for invalid inc_votes value in request body", () => {
     return request(app)
       .patch("/api/articles/1")
-      .send({inc_votes: "NaN"})
+      .send({ inc_votes: "NaN" })
       .expect(400)
       .then(({ body }) => {
         expect(body).toEqual({
@@ -326,29 +326,48 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
-describe('DELETE /api/comments/:comment_id', () => {
-  it('Responds with 204 and no content when a comment is successfully deleted', () => {
+describe("DELETE /api/comments/:comment_id", () => {
+  it("Responds with 204 and no content when a comment is successfully deleted", () => {
     return request(app)
-      .delete('/api/comments/1')
+      .delete("/api/comments/1")
       .expect(204)
       .then((response) => {
         expect(response.body).toEqual({});
       });
   });
-  it('Responds with 404 for non-existent comment', () => {
+  it("Responds with 404 for non-existent comment", () => {
     return request(app)
-      .delete('/api/comments/9999')
+      .delete("/api/comments/9999")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('comment not found');
+        expect(body.msg).toBe("comment not found");
       });
   });
-  it('Responds with 400 for invalid comment ID', () => {
+  it("Responds with 400 for invalid comment ID", () => {
     return request(app)
-      .delete('/api/comments/NaN')
+      .delete("/api/comments/NaN")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('invalid input');
+        expect(body.msg).toBe("invalid input");
       });
   });
-})
+});
+
+describe("GET /api/users", () => {
+  it("Responds with an array of users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body: { users } }) => {
+        expect(Array.isArray(users)).toBe(true);
+        expect(users.length).toBeGreaterThan(0);
+        users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
+      });
+  });
+});
