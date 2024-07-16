@@ -20,3 +20,4 @@ exports.formatComments = (comments, idLookup) => {
     };
   });
 };
+

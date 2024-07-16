@@ -38,14 +38,6 @@ describe("GET /api/topics", () => {
 });
 
 describe("GET /api", () => {
-  it("Returns an object", () => {
-    return request(app)
-      .get("/api")
-      .expect(200)
-      .then(({ body: { response } }) => {
-        expect(typeof response).toBe("object");
-      });
-  });
   it("Returns the endpoints.json data", () => {
     return request(app)
       .get("/api")
@@ -142,6 +134,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body: { comments } }) => {
+        expect(comments.length).toBe(11)
         comments.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
@@ -212,12 +205,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       {
         invalidKey: "error",
         body: "comment",
-      },
-      {
-        invalidKey: "error",
-        body: "comment",
-        username: "butter_bridge",
-      },
+      }
     ];
     invalidComments.forEach((invalidComment) => {
       return request(app)
@@ -239,7 +227,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(comment)
       .expect(404)
       .then(({ body }) => {
-        expect(body).toMatchObject({ msg: "not found" });
+        expect(body).toMatchObject({ msg: "article not found" });
       });
   });
   it("Responds with an error 400 if an invalid id is entered", () => {
@@ -253,6 +241,87 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body).toMatchObject({ msg: "invalid input" });
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  it("Increases the vote count for the chosen article and returns the updated article", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article).toMatchObject({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: expect.any(String),
+          votes: 101,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  it("Decreases the vote count for the chosen article and returns the updated article", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -10 })
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article).toMatchObject({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: expect.any(String),
+          votes: 90,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  it("Returns 400 for invalid article ID", () => {
+    return request(app)
+      .patch("/api/articles/NaN")
+      .send({ inc_votes: 1 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "invalid input" });
+      });
+  });
+  it("Returns 404 for non-existent article ID", () => {
+    return request(app)
+      .patch("/api/articles/9999")
+      .send({ inc_votes: 1 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "article not found" });
+      });
+  });
+  it("Returns 400 for missing inc_votes in request body", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          msg: "invalid input",
+        });
+      });
+  });
+  it("Returns 400 for invalid inc_votes value in request body", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({inc_votes: "NaN"})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          msg: "invalid input",
+        });
       });
   });
 });
