@@ -105,6 +105,7 @@ describe("GET /api/articles", () => {
         });
       });
   });
+
   it("Does not include a body property on any of the objects", () => {
     return request(app)
       .get("/api/articles")
@@ -115,15 +116,74 @@ describe("GET /api/articles", () => {
         });
       });
   });
-  it("Sorts the array by date in descending order", () => {
+
+  it("Sorts the array by date in descending order by default", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
       .then(({ body: { articles } }) => {
         expect(articles).toBeSortedBy("created_at", {
-          coearce: true,
+          coerce: true,
           descending: true,
         });
+      });
+  });
+
+  it("Sorts the array by the specified column in the specified order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("title", {
+          coerce: true,
+          descending: false,
+        });
+      });
+  });
+
+  const sort_by = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "article_img_url",
+  ];
+  const order = ["asc", "desc", "ASC", "DESC"];
+
+  sort_by.forEach((sortField) => {
+    order.forEach((orderType) => {
+      it(`Sorts the array by ${sortField} in ${orderType} order regardless of case`, () => {
+        return request(app)
+          .get(`/api/articles?sort_by=${sortField}&order=${orderType}`)
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            const descending = orderType.toLowerCase() === "desc";
+            expect(articles).toBeSortedBy(sortField, {
+              coerce: true,
+              descending,
+            });
+          });
+      });
+    });
+  });
+
+  it("Returns a 400 error when given an invalid sort_by query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=invalidColumn")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid input");
+      });
+  });
+
+  it("Returns a 400 error when given an invalid order query", () => {
+    return request(app)
+      .get("/api/articles?order=invalidOrder")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid input");
       });
   });
 });
@@ -360,7 +420,7 @@ describe("GET /api/users", () => {
       .expect(200)
       .then(({ body: { users } }) => {
         expect(Array.isArray(users)).toBe(true);
-        expect(users.length).toBeGreaterThan(0);
+        expect(users.length).toBe(4);
         users.forEach((user) => {
           expect(user).toMatchObject({
             username: expect.any(String),
