@@ -77,5 +77,9 @@
       "votes": 1,
       "article_img_url": "https://images.pexels.com/photos/11035380/pexels-photo-11035380.jpeg?w=700&h=700"
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes the specified comment and returns no content",
+    "exampleResponse": {}
   }
 }

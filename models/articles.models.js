@@ -42,10 +42,10 @@ exports.fetchArticleCommentsById = (article_id) => {
 exports.addCommentToArticleId = (comment, article_id) => {
   const { username, body } = comment;
 
-  if (Object.keys(comment).length != 2 || !username || !body) {
+  if (!username || !body) {
     return Promise.reject({ status: 400, msg: "invalid comment input" });
   }
-
+ 
   return db.query(
     `INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *`,
     [username, body, article_id]
@@ -53,9 +53,9 @@ exports.addCommentToArticleId = (comment, article_id) => {
 };
 
 exports.updateArticleById = (article_id, voteObj) => {
-  const {inc_votes} = voteObj
+  const { inc_votes } = voteObj;
   if (!inc_votes || typeof inc_votes != "number") {
-    return Promise.reject({status: 400, msg: "invalid input"})
+    return Promise.reject({ status: 400, msg: "invalid input" });
   }
   return db.query(
     `UPDATE articles

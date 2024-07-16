@@ -325,3 +325,30 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
 });
+
+describe('DELETE /api/comments/:comment_id', () => {
+  it('Responds with 204 and no content when a comment is successfully deleted', () => {
+    return request(app)
+      .delete('/api/comments/1')
+      .expect(204)
+      .then((response) => {
+        expect(response.body).toEqual({});
+      });
+  });
+  it('Responds with 404 for non-existent comment', () => {
+    return request(app)
+      .delete('/api/comments/9999')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('comment not found');
+      });
+  });
+  it('Responds with 400 for invalid comment ID', () => {
+    return request(app)
+      .delete('/api/comments/NaN')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('invalid input');
+      });
+  });
+})
