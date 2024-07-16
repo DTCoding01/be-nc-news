@@ -13,14 +13,8 @@ exports.fetchArticles = () => {
               COUNT(comments.comment_id) AS comment_count
           FROM articles
           LEFT JOIN comments ON articles.article_id = comments.article_id
-          GROUP BY
-              articles.author,
-              articles.title,
-              articles.article_id,
-              articles.topic,
-              articles.created_at,
-              articles.votes,
-              articles.article_img_url
+          GROUP BY 
+              articles.article_id   
           ORDER BY articles.created_at DESC;
       `);
 };
@@ -48,7 +42,6 @@ exports.fetchArticleCommentsById = (article_id) => {
 exports.addCommentToArticleId = (comment, article_id) => {
   const { username, body } = comment;
 
-
   if (Object.keys(comment).length != 2 || !username || !body) {
     return Promise.reject({ status: 400, msg: "invalid comment input" });
   }
@@ -56,5 +49,19 @@ exports.addCommentToArticleId = (comment, article_id) => {
   return db.query(
     `INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *`,
     [username, body, article_id]
+  );
+};
+
+exports.updateArticleById = (article_id, voteObj) => {
+  const {inc_votes} = voteObj
+  if (!inc_votes || typeof inc_votes != "number") {
+    return Promise.reject({status: 400, msg: "invalid input"})
+  }
+  return db.query(
+    `UPDATE articles
+    SET votes = votes + $1
+    WHERE article_id = $2
+    RETURNING *`,
+    [inc_votes, article_id]
   );
 };
