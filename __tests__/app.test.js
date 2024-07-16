@@ -182,3 +182,77 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  it("Posts a new comment to the specific article and returns the comment", () => {
+    const comment = {
+      username: "butter_bridge",
+      body: "comment",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(comment)
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment).toMatchObject({
+          comment_id: 19,
+          body: "comment",
+          article_id: 1,
+          author: "butter_bridge",
+          votes: 0,
+          created_at: expect.any(String),
+        });
+      });
+  });
+  it("Returns an error if an invalid comment object is sent", () => {
+    const invalidComments = [
+      {
+        invalidKey: "error",
+      },
+      {
+        invalidKey: "error",
+        body: "comment",
+      },
+      {
+        invalidKey: "error",
+        body: "comment",
+        username: "butter_bridge",
+      },
+    ];
+    invalidComments.forEach((invalidComment) => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(invalidComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toMatchObject({ msg: "invalid comment input" });
+        });
+    });
+  });
+  it("Responds with an error 404 if an id is entered that does not exist", () => {
+    const comment = {
+      username: "butter_bridge",
+      body: "comment",
+    };
+    return request(app)
+      .post("/api/articles/999999/comments")
+      .send(comment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toMatchObject({ msg: "not found" });
+      });
+  });
+  it("Responds with an error 400 if an invalid id is entered", () => {
+    const comment = {
+      username: "butter_bridge",
+      body: "comment",
+    };
+    return request(app)
+      .post("/api/articles/NaN/comments")
+      .send(comment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toMatchObject({ msg: "invalid input" });
+      });
+  });
+});

@@ -44,3 +44,17 @@ exports.fetchArticleCommentsById = (article_id) => {
     [article_id]
   );
 };
+
+exports.addCommentToArticleId = (comment, article_id) => {
+  const { username, body } = comment;
+
+
+  if (Object.keys(comment).length != 2 || !username || !body) {
+    return Promise.reject({ status: 400, msg: "invalid comment input" });
+  }
+
+  return db.query(
+    `INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *`,
+    [username, body, article_id]
+  );
+};
