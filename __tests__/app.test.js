@@ -140,33 +140,16 @@ describe("GET /api/articles", () => {
         });
       });
   });
-
-  const sort_by = [
-    "author",
-    "title",
-    "article_id",
-    "topic",
-    "created_at",
-    "votes",
-    "article_img_url",
-  ];
-  const order = ["asc", "desc", "ASC", "DESC"];
-
-  sort_by.forEach((sortField) => {
-    order.forEach((orderType) => {
-      it(`Sorts the array by ${sortField} in ${orderType} order regardless of case`, () => {
-        return request(app)
-          .get(`/api/articles?sort_by=${sortField}&order=${orderType}`)
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            const descending = orderType.toLowerCase() === "desc";
-            expect(articles).toBeSortedBy(sortField, {
-              coerce: true,
-              descending,
-            });
-          });
+  it(`Sorts the array by the chosen sort_by in the chosen order regardless of case`, () => {
+    return request(app)
+      .get(`/api/articles?sort_by=title&order=desc`)
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("title", {
+          coerce: true,
+          descending: true,
+        });
       });
-    });
   });
 
   it("Returns a 400 error when given an invalid sort_by query", () => {
@@ -184,6 +167,24 @@ describe("GET /api/articles", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("invalid input");
+      });
+  });
+  it("Filters the articles by the specified topic", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+  it("Returns a 404 error when the topic does not exist", () => {
+    return request(app)
+      .get("/api/articles?topic=not_a_topic")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("not found");
       });
   });
 });

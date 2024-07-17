@@ -1,6 +1,6 @@
 const db = require("../db/connection.js");
 
-exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
+exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
   const allowedSortByInputs = [
     "author",
     "title",
@@ -13,13 +13,16 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
 
   const allowedOrderInputs = ["ASC", "DESC"];
 
-  const upperCaseOrder = order.toUpperCase()
+  const upperCaseOrder = order.toUpperCase();
 
-  if (!allowedSortByInputs.includes(sort_by) || !allowedOrderInputs.includes(upperCaseOrder)) {
-    return Promise.reject({status: 400, msg: "invalid input"})
-  } 
+  if (
+    !allowedSortByInputs.includes(sort_by) ||
+    !allowedOrderInputs.includes(upperCaseOrder)
+  ) {
+    return Promise.reject({ status: 400, msg: "invalid input" });
+  }
 
-    let queryStr = `
+  let queryStr = `
     SELECT
       articles.author,
       articles.title,
@@ -30,12 +33,19 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
       articles.article_img_url,
       COUNT(comments.comment_id) AS comment_count
     FROM articles
-    LEFT JOIN comments ON articles.article_id = comments.article_id
-    GROUP BY 
-      articles.article_id
-    ORDER BY ${sort_by} ${order.toUpperCase()}`;
+    LEFT JOIN comments ON articles.article_id = comments.article_id `;
 
-  return db.query(queryStr);
+  const queryValues = [];
+  if (topic) {
+    queryStr += `WHERE articles.topic = $1 `;
+    queryValues.push(topic);
+  }
+
+  queryStr += `GROUP BY 
+    articles.article_id
+  ORDER BY ${sort_by} ${order.toUpperCase()}`;
+
+  return db.query(queryStr, queryValues);
 };
 
 exports.fetchArticleById = (article_id) => {
