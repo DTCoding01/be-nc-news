@@ -32,7 +32,7 @@ app.patch("/api/articles/:article_id", patchArticleById);
 
 app.delete("/api/comments/:comment_id", deleteCommentById);
 
-app.use((req, res, next) => {
+app.all('*', (req, res) => {
   res.status(404).send({ msg: "endpoint not found" });
 });
 
