@@ -64,7 +64,7 @@ describe("GET /api/articles/:article_id", () => {
           votes: 100,
           article_img_url:
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-            comment_count: "11"
+          comment_count: "11",
         });
       });
   });
@@ -431,6 +431,17 @@ describe("GET /api/users", () => {
             avatar_url: expect.any(String),
           });
         });
+      });
+  });
+});
+
+describe("Invalid endpoint handler", () => {
+  test("should return 404 for invalid endpoints", () => {
+    return request(app)
+      .get("/invalid-endpoint")
+      .then((response) => {
+        expect(response.status).toBe(404);
+        expect(response.body).toEqual({ msg: "endpoint not found" });
       });
   });
 });
