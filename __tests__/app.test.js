@@ -49,7 +49,7 @@ describe("GET /api", () => {
 });
 
 describe("GET /api/articles/:article_id", () => {
-  it("Responds with the article object of the chosen id", () => {
+  it("Responds with the article object of the chosen id including coment_count", () => {
     return request(app)
       .get("/api/articles/1")
       .expect(200)
@@ -64,9 +64,11 @@ describe("GET /api/articles/:article_id", () => {
           votes: 100,
           article_img_url:
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: "11"
         });
       });
   });
+
   it("Responds with an error 404 if an id is entered that does not exist", () => {
     return request(app)
       .get("/api/articles/999999")
