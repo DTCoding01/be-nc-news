@@ -416,7 +416,7 @@ describe("PATCH /api/comments/:comment_id", () => {
           votes: 15,
           author: "butter_bridge",
           article_id: 9,
-          created_at:  expect.any(String),
+          created_at: expect.any(String),
         });
       });
   });
@@ -539,6 +539,99 @@ describe("Invalid endpoint handler", () => {
       .then((response) => {
         expect(response.status).toBe(404);
         expect(response.body).toEqual({ msg: "endpoint not found" });
+      });
+  });
+});
+
+describe("POST /api/articles", () => {
+  it("Posts a new article and returns the posted article with default url when not provided", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "butter_bridge",
+        title: "new article",
+        body: "body",
+        topic: "cats",
+      })
+      .expect(201)
+      .then(({ body: { post } }) => {
+        expect(post).toMatchObject({
+          author: "butter_bridge",
+          title: "new article",
+          body: "body",
+          topic: "cats",
+          article_img_url:
+            "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700",
+          article_id: expect.any(Number),
+          votes: 0,
+          created_at: expect.any(String),
+          comment_count: "0",
+        });
+      });
+  });
+  it("Posts a new article and returns the posted article with provided url", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "butter_bridge",
+        title: "new article with image",
+        body: "body",
+        topic: "cats",
+        article_img_url: "http://some-url.com/image.jpg",
+      })
+      .expect(201)
+      .then(({ body: { post } }) => {
+        expect(post).toMatchObject({
+          author: "butter_bridge",
+          title: "new article with image",
+          body: "body",
+          topic: "cats",
+          article_img_url: "http://some-url.com/image.jpg",
+          article_id: expect.any(Number),
+          votes: 0,
+          created_at: expect.any(String),
+          comment_count: "0",
+        });
+      });
+  });
+  it("Returns 400 when required fields are missing", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "butter_bridge",
+        title: "missing body and topic",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid input");
+      });
+  });
+  it("Returns 400 when author does not exist", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "nonexistent_user",
+        title: "new article",
+        body: "body",
+        topic: "cats",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid input");
+      });
+  });
+  it("Returns 400 when topic does not exist", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "butter_bridge",
+        title: "new article",
+        body: "body",
+        topic: "nonexistent_topic",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid input");
       });
   });
 });

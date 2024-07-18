@@ -103,3 +103,42 @@ exports.updateArticleById = (article_id, voteObj) => {
     [inc_votes, article_id]
   );
 };
+
+exports.addArticle = (article) => {
+  const { author, title, body, topic, article_img_url } = article;
+
+  if (!author || !title || !body || !topic) {
+    return Promise.reject({ status: 400, msg: "invalid input" });
+  }
+
+  const queryParams = [author, title, body, topic];
+  let queryStr = `
+  WITH inserted_article AS (
+    INSERT INTO articles (author, title, body, topic`;
+
+  if (article_img_url) {
+    queryStr += `, article_img_url) VALUES ($1, $2, $3, $4, $5)`;
+    queryParams.push(article_img_url);
+  } else {
+    queryStr += `) VALUES ($1, $2, $3, $4)`;
+  }
+
+  queryStr += ` RETURNING article_id, author, title, body, topic, article_img_url, votes, created_at
+  )
+  SELECT 
+    inserted_article.*,
+    COUNT(comments.comment_id) AS comment_count
+  FROM inserted_article
+  LEFT JOIN comments ON inserted_article.article_id = comments.article_id
+  GROUP BY 
+    inserted_article.article_id,
+    inserted_article.author,
+    inserted_article.title,
+    inserted_article.body,
+    inserted_article.topic,
+    inserted_article.article_img_url,
+    inserted_article.votes,
+    inserted_article.created_at`;
+
+  return db.query(queryStr, queryParams);
+};

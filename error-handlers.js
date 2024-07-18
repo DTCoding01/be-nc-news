@@ -2,8 +2,15 @@ exports.handleInvalidInput = (err, req, res, next) => {
   if (!err.code) {
     return next(err);
   }
-  if (err.code === "22P02") {
-    res.status(400).send({ msg: "invalid input" });
+
+  const errorCodes = {
+    "22P02": "invalid input",
+    23503: "invalid input",
+  };
+
+  const errorMessage = errorCodes[err.code];
+  if (errorMessage) {
+    res.status(400).send({ msg: errorMessage });
   } else {
     next(err);
   }
