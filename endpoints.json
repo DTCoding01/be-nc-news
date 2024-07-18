@@ -95,5 +95,15 @@
         }
       ]
     }
+  },
+  "GET /api/users/:username": {
+    "description": "serves an object of the user with the specified username",
+    "exampleResponse": {
+      "user": {
+        "username": "tickle122",
+        "name": "Tom Tickle",
+        "avatar_url": "https://www.example.com/avatar.jpg"
+      }
+    }
   }
 }
