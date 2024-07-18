@@ -53,18 +53,30 @@
       }
     ]
   },
+  "POST /api/articles": {
+    "description": "adds a new article and returns the newly added article",
+    "exampleResponse": {
+      "article_id": 1,
+      "author": "butter_bridge",
+      "title": "new article",
+      "body": "body",
+      "topic": "cats",
+      "article_img_url": "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700",
+      "votes": 0,
+      "created_at": "2024-07-15T15:46:28.056Z",
+      "comment_count": "0"
+    }
+  },
   "POST /api/articles/:article_id/comments": {
     "description": "adds a comment to a specific article id",
-    "exampleResponse": [
-      {
-        "comment_id": 19,
-        "body": "comment",
-        "article_id": 1,
-        "author": "butter_bridge",
-        "votes": 0,
-        "created_at": "2024-07-15T15:46:28.056Z"
-      }
-    ]
+    "exampleResponse": {
+      "comment_id": 19,
+      "body": "comment",
+      "article_id": 1,
+      "author": "butter_bridge",
+      "votes": 0,
+      "created_at": "2024-07-15T15:46:28.056Z"
+    }
   },
   "PATCH /api/articles/:article_id": {
     "description": "updates the vote count for the chosen article and returns the new article object",

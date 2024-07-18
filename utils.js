@@ -20,3 +20,12 @@ exports.checkCommentExists = (comment_id) => {
       return rows[0];
     });
 };
+
+exports.checkRowsLength = (rows) => {
+  if (rows.length === 0) {
+    return Promise.reject({status: 404, msg: "not found"})
+  }
+
+  return rows
+}
+
