@@ -1,6 +1,12 @@
 const db = require("../db/connection.js");
 
-exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
+exports.fetchArticles = (
+  sort_by = "created_at",
+  order = "desc",
+  topic,
+  limit = 10,
+  p = 1
+) => {
   const allowedSortByInputs = [
     "author",
     "title",
@@ -13,14 +19,15 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
 
   const allowedOrderInputs = ["ASC", "DESC"];
 
-  const upperCaseOrder = order.toUpperCase();
-
   if (
     !allowedSortByInputs.includes(sort_by) ||
-    !allowedOrderInputs.includes(upperCaseOrder)
+    !allowedOrderInputs.includes(order.toUpperCase())
   ) {
     return Promise.reject({ status: 400, msg: "invalid input" });
   }
+
+  const offset = (p - 1) * limit;
+  const queryValues = [limit, offset];
 
   let queryStr = `
     SELECT
@@ -35,17 +42,32 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
     FROM articles
     LEFT JOIN comments ON articles.article_id = comments.article_id `;
 
-  const queryValues = [];
+  let totalCountQuery = `
+    SELECT COUNT(*) AS total_count
+    FROM articles`;
+
   if (topic) {
-    queryStr += `WHERE articles.topic = $1 `;
+    queryStr += `WHERE articles.topic = $3 `;
     queryValues.push(topic);
+    totalCountQuery += ` WHERE topic = $1`;
   }
 
   queryStr += `GROUP BY 
     articles.article_id
-  ORDER BY ${sort_by} ${order.toUpperCase()}`;
+  ORDER BY ${sort_by} ${order.toUpperCase()}
+  LIMIT $1 OFFSET $2`;
 
-  return db.query(queryStr, queryValues);
+  return db
+    .query(totalCountQuery, topic ? [topic] : [])
+    .then((totalCountResult) => {
+      return Promise.all([db.query(queryStr, queryValues), totalCountResult]);
+    })
+    .then(([articlesResult, totalCountResult]) => {
+      return {
+        articles: articlesResult.rows,
+        total_count: parseInt(totalCountResult.rows[0].total_count, 10),
+      };
+    });
 };
 
 exports.fetchArticleById = (article_id) => {
