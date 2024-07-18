@@ -11,14 +11,14 @@ const { checkRowsLength } = require("../utils");
 const { checkArticleExists } = require("../utils");
 
 exports.getArticles = (req, res, next) => {
-  const { sort_by, order, topic } = req.query;
-  fetchArticles(sort_by, order, topic)
-    .then(({ rows }) => {
-      return checkRowsLength(rows);
-    })
+  const { sort_by, order, topic, limit, p } = req.query;
 
-    .then((articles) => {
-      res.status(200).send({ articles });
+  fetchArticles(sort_by, order, topic, limit, p)
+    .then(({ articles, total_count }) => {
+      return Promise.all([checkRowsLength(articles), total_count]);
+    })
+    .then(([articles, total_count]) => {
+      res.status(200).send({ articles, total_count });
     })
     .catch(next);
 };

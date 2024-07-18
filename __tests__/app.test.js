@@ -189,6 +189,43 @@ describe("GET /api/articles", () => {
         expect(body.msg).toBe("not found");
       });
   });
+  it("responds with paginated articles and total count", () => {
+    return request(app)
+      .get("/api/articles?limit=2&p=1")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toHaveLength(2);
+        expect(body.total_count).toBeGreaterThan(2);
+      });
+  });
+
+  it("returns the correct articles for the second page", () => {
+    return request(app)
+      .get("/api/articles?limit=2&p=2")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toHaveLength(2);
+        expect(body.total_count).toBeGreaterThan(2);
+      });
+  });
+
+  it("returns 400 for invalid limit", () => {
+    return request(app)
+      .get("/api/articles?limit=invalid")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid input");
+      });
+  });
+
+  it("returns 400 for invalid page", () => {
+    return request(app)
+      .get("/api/articles?p=invalid")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("invalid input");
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {

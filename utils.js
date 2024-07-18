@@ -26,6 +26,6 @@ exports.checkRowsLength = (rows) => {
     return Promise.reject({status: 404, msg: "not found"})
   }
 
-  return rows
+  return Promise.resolve(rows)
 }
 
