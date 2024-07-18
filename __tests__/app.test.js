@@ -389,6 +389,79 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
+describe("PATCH /api/comments/:comment_id", () => {
+  it("Increases the vote count for the chosen comment and returns the updated comment", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        expect(comment).toMatchObject({
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: 17,
+          author: "butter_bridge",
+          article_id: 9,
+          created_at: expect.any(String),
+        });
+      });
+  });
+  it("Decreases the vote count for the chosen comment and returns the updated comment", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: -1 })
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        expect(comment).toMatchObject({
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: 15,
+          author: "butter_bridge",
+          article_id: 9,
+          created_at:  expect.any(String),
+        });
+      });
+  });
+  it("Returns 400 for invalid comment ID", () => {
+    return request(app)
+      .patch("/api/comments/NaN")
+      .send({ inc_votes: 1 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "invalid input" });
+      });
+  });
+  it("Returns 404 for non-existent comment ID", () => {
+    return request(app)
+      .patch("/api/comments/9999")
+      .send({ inc_votes: 1 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "not found" });
+      });
+  });
+  it("Returns 400 for missing inc_votes in request body", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          msg: "invalid input",
+        });
+      });
+  });
+  it("Returns 400 for invalid inc_votes value in request body", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: "NaN" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          msg: "invalid input",
+        });
+      });
+  });
+});
+
 describe("DELETE /api/comments/:comment_id", () => {
   it("Responds with 204 and no content when a comment is successfully deleted", () => {
     return request(app)
