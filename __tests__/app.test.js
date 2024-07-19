@@ -782,3 +782,54 @@ describe("addTopic", () => {
       });
   });
 });
+describe("DELETE /api/articles/:article_id", () => {
+  it("should delete the article and respond with 204 status", () => {
+    return request(app).delete(`/api/articles/1`).expect(204);
+  });
+  it("should respond with 404 if the article does not exist", () => {
+    const nonExistentArticleId = 999999;
+
+    return request(app)
+      .delete(`/api/articles/${nonExistentArticleId}`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "article not found" });
+      });
+  });
+
+  it("should respond with 400 if the article_id is invalid", () => {
+    return request(app)
+      .delete(`/api/articles/not-an-id`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "invalid input" });
+      });
+  });
+});
+describe("DELETE /api/articles/:article_id/comments", () => {
+  it("should delete all comments for a given article_id and respond with 204 status", () => {
+    return request(app)
+      .delete(`/api/articles/1/comments`)
+      .expect(204)
+  });
+
+  it("should respond with 404 if the article does not exist", () => {
+  
+
+    return request(app)
+      .delete(`/api/articles/9999999/comments`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "article not found" });
+      });
+  });
+
+  it("should respond with 400 if the article_id is invalid", () => {
+    return request(app)
+      .delete(`/api/articles/not-an-id/comments`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "invalid input" });
+      });
+  });
+});

@@ -6,7 +6,11 @@ const {
   topicData,
   userData,
 } = require("../db/data/test-data/index.js");
-const { checkArticleExists, checkCommentExists } = require("../utils");
+const {
+  checkArticleExists,
+  checkCommentExists,
+  checkRowsLength,
+} = require("../utils");
 
 beforeEach(() => seed({ topicData, userData, articleData, commentData }));
 afterAll(() => db.end());
@@ -64,4 +68,31 @@ describe("checkCommentExists", () => {
   });
 });
 
+describe("checkRowsLength", () => {
+  it("Resolves with the rows if they are not empty", () => {
+    const mockRows = [
+      {
+        comment_id: 1,
+        author: "test_author",
+        article_id: 1,
+        votes: 10,
+        created_at: new Date(),
+        body: "test body",
+      },
+    ];
 
+    return checkRowsLength(mockRows).then((rows) => {
+      expect(rows).toEqual(mockRows);
+    });
+  });
+
+  it("Rejects with a 404 error if rows are empty", () => {
+    const mockRows = [];
+
+    return checkRowsLength(mockRows)
+      .then()
+      .catch((err) => {
+        expect(err).toEqual({ status: 404, msg: "not found" });
+      });
+  });
+});

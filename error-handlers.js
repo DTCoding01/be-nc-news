@@ -1,5 +1,4 @@
 exports.handleInvalidInput = (err, req, res, next) => {
- 
   if (!err.code) {
     return next(err);
   }
@@ -26,6 +25,6 @@ exports.handleCustomErrors = (err, req, res, next) => {
 };
 
 exports.handleInternalErrors = (err, req, res, next) => {
-  console.log(err)
+  
   res.status(500).send({ msg: "internal server error" });
 };

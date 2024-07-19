@@ -84,6 +84,10 @@
       }
     ]
   },
+  "DELETE /api/articles/:article_id/comments": {
+    "description": "deletes all comments for a specific article id and returns no content",
+    "exampleResponse": {}
+  },
   "PATCH /api/articles/:article_id": {
     "description": "updates the vote count for the chosen article and returns the new article object",
     "exampleResponse": {
@@ -96,6 +100,10 @@
       "votes": 1,
       "article_img_url": "https://example.com/image.jpg"
     }
+  },
+  "DELETE /api/articles/:article_id": {
+    "description": "deletes the specified article and its associated comments, returns no content",
+    "exampleResponse": {}
   },
   "DELETE /api/comments/:comment_id": {
     "description": "deletes the specified comment and returns no content",

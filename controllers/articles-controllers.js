@@ -5,9 +5,10 @@ const {
   addCommentToArticleId,
   updateArticleById,
   addArticle,
+  removeArticleById,
+  removeCommentsByArticleId,
 } = require("../models/articles.models");
 const { checkRowsLength } = require("../utils");
-
 const { checkArticleExists } = require("../utils");
 
 exports.getArticles = (req, res, next) => {
@@ -85,6 +86,33 @@ exports.postArticle = (req, res, next) => {
     .then(({ rows }) => {
       const post = rows[0];
       res.status(201).send({ post });
+    })
+    .catch(next);
+};
+
+exports.deleteArticleById = (req, res, next) => {
+  const { article_id } = req.params;
+  checkArticleExists(article_id)
+    .then(() => {
+      return removeCommentsByArticleId(article_id);
+    })
+    .then(() => {
+      return removeArticleById(article_id);
+    })
+    .then(() => {
+      res.sendStatus(204);
+    })
+    .catch(next);
+};
+
+exports.deleteArticleCommentsById = (req, res, next) => {
+  const { article_id } = req.params;
+  checkArticleExists(article_id)
+    .then(() => {
+      return removeCommentsByArticleId(article_id);
+    })
+    .then(() => {
+      res.sendStatus(204);
     })
     .catch(next);
 };
