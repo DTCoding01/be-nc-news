@@ -234,7 +234,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body: { comments } }) => {
-        expect(comments.length).toBe(11);
+        expect(comments.length).toBe(10);
         comments.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
@@ -269,6 +269,51 @@ describe("GET /api/articles/:article_id/comments", () => {
   it("Responds with an error 400 if an invalid id is entered", () => {
     return request(app)
       .get("/api/articles/NaN/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toMatchObject({ msg: "invalid input" });
+      });
+  });
+  it("Returns a limited number of comments when limit query is provided", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments.length).toBe(5);
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: 1,
+          });
+        });
+      });
+  });
+
+  it("Returns the correct comments for the given page", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5&p=2")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments.length).toBe(5);
+      });
+  });
+
+  it("Returns an 404 if the page is out of range", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=10&p=100")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toMatchObject({ msg: "not found" });
+      });
+  });
+
+  it("Responds with an error 400 if limit or p is invalid", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=invalid&p=invalid")
       .expect(400)
       .then(({ body }) => {
         expect(body).toMatchObject({ msg: "invalid input" });
