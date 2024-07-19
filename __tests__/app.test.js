@@ -717,3 +717,68 @@ describe("POST /api/articles", () => {
       });
   });
 });
+describe("addTopic", () => {
+  it("should add a topic and return the added topic object", () => {
+    const newTopic = {
+      slug: "new-topic",
+      description: "A new topic for testing",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(201)
+      .then(({ body: { topic } }) => {
+        expect(topic).toMatchObject({
+          slug: "new-topic",
+          description: "A new topic for testing",
+        });
+      });
+  });
+
+  it("should return an error if slug is missing", () => {
+    const newTopic = {
+      description: "A new topic for testing",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toMatchObject({
+          msg: "invalid input",
+        });
+      });
+  });
+
+  it("should return an error if description is missing", () => {
+    const newTopic = {
+      slug: "new-topic",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toMatchObject({
+          msg: "invalid input",
+        });
+      });
+  });
+
+  it("should return an error if both slug and description are missing", () => {
+    const newTopic = {};
+
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toMatchObject({
+          msg: "invalid input",
+        });
+      });
+  });
+});
