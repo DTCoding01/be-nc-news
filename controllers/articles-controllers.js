@@ -38,7 +38,9 @@ exports.getArticleById = (req, res, next) => {
 
 exports.getArticleCommentsById = (req, res, next) => {
   const { article_id } = req.params;
-  fetchArticleCommentsById(article_id)
+  const { limit, p } = req.query;
+
+  fetchArticleCommentsById(article_id, limit, p)
     .then(({ rows }) => {
       return checkRowsLength(rows);
     })
