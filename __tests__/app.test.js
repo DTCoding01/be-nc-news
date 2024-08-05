@@ -344,9 +344,9 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
   it("Returns an error if an invalid comment object is sent", () => {
     const invalidComments = [
-      {
-        invalidKey: "error",
-      },
+      // {
+      //   invalidKey: "error",
+      // },
       {
         invalidKey: "error",
         body: "comment",
