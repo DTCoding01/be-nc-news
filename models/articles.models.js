@@ -83,19 +83,28 @@ exports.fetchArticleById = (article_id) => {
   );
 };
 
-exports.fetchArticleCommentsById = (article_id, limit = 10, p = 1) => {
-  let queryStr = `SELECT 
-    comments.comment_id, 
-    comments.votes, 
-    comments.created_at, 
-    comments.author, 
-    comments.body,
-    comments.article_id
-  FROM comments
-  WHERE comments.article_id = $1
-  ORDER BY comments.created_at DESC LIMIT $2 OFFSET $3`;
-  const offset = (p - 1) * limit;
-  const queryValues = [article_id, limit, offset];
+exports.fetchArticleCommentsById = (article_id, limit, p) => {
+  let queryStr = `
+    SELECT 
+      comments.comment_id, 
+      comments.votes, 
+      comments.created_at, 
+      comments.author, 
+      comments.body,
+      comments.article_id
+    FROM comments
+    WHERE comments.article_id = $1
+    ORDER BY comments.created_at DESC
+  `;
+
+  const queryValues = [article_id];
+
+  if (limit && p) {
+    queryStr += ` LIMIT $2 OFFSET $3`;
+    const offset = (p - 1) * limit;
+    queryValues.push(limit, offset);
+  }
+
   return db.query(queryStr, queryValues);
 };
 
@@ -169,7 +178,6 @@ exports.removeArticleById = (article_id) => {
   return db.query("DELETE FROM articles WHERE article_id = $1", [article_id]);
 };
 
-
 exports.removeCommentsByArticleId = (article_id) => {
-  return db.query("DELETE FROM comments WHERE article_id = $1", [article_id])
-}
+  return db.query("DELETE FROM comments WHERE article_id = $1", [article_id]);
+};
