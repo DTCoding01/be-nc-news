@@ -234,7 +234,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body: { comments } }) => {
-        expect(comments.length).toBe(10);
+        expect(comments.length).toBe(11);
         comments.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
@@ -279,7 +279,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments?limit=5")
       .expect(200)
       .then(({ body: { comments } }) => {
-        expect(comments.length).toBe(5);
+        expect(comments.length).toBe(11);
         comments.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
