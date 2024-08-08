@@ -7,7 +7,7 @@ const { getApi } = require("../controllers/api-controllers");
 
 apiRouter.use("/topics", topicsRouter);
 apiRouter.use("/articles", articlesRouter);
-apiRouter.use("/users", usersRouter);
+apiRouter.use("/users", usersRouter); 
 apiRouter.use("/comments", commentsRouter);
 
 apiRouter.get("/", getApi);

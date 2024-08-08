@@ -163,5 +163,41 @@
       "created_at": "2024-07-15T15:46:28.056Z",
       "comment_count": "0"
     }
+  },
+  "POST /api/users/:username/follow-topic": {
+    "description": "allows a user to follow a topic",
+    "requestBody": {
+      "topicSlug": "string"
+    },
+    "exampleResponse": {
+      "msg": "User butter_bridge followed topic mitch"
+    }
+  },
+  "DELETE /api/users/:username/unfollow-topic": {
+    "description": "allows a user to unfollow a topic",
+    "requestBody": {
+      "topicSlug": "string"
+    },
+    "exampleResponse": {
+      "msg": "User butter_bridge unfollowed topic mitch"
+    }
+  },
+  "POST /api/users/:followerUsername/follow-user": {
+    "description": "allows a user to follow another user",
+    "requestBody": {
+      "followeeUsername": "string"
+    },
+    "exampleResponse": {
+      "msg": "User butter_bridge followed user icellusedkars"
+    }
+  },
+  "DELETE /api/users/:followerUsername/unfollow-user": {
+    "description": "allows a user to unfollow another user",
+    "requestBody": {
+      "followeeUsername": "string"
+    },
+    "exampleResponse": {
+      "msg": "User butter_bridge unfollowed user icellusedkars"
+    }
   }
 }

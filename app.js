@@ -1,5 +1,6 @@
 const express = require("express");
 const apiRouter = require("./routers/api-router");
+const followRouter = require("./routers/follow-routers.js");
 const {
   handleInvalidInput,
   handleCustomErrors,
@@ -14,7 +15,7 @@ app.use(express.json());
 app.use("/api", apiRouter);
 
 app.all("*", (req, res) => {
-  res.status(404).send({ msg: "endpoint not found" });
+  res.status(404).send({ msg: "Endpoint not found" });
 });
 
 app.use(handleInvalidInput);
