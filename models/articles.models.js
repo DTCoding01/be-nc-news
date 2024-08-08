@@ -15,7 +15,7 @@ exports.fetchArticles = (
     "created_at",
     "votes",
     "article_img_url",
-    'comment_count'
+    "comment_count",
   ];
 
   const allowedOrderInputs = ["ASC", "DESC"];

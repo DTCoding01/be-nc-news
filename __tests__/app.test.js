@@ -620,7 +620,7 @@ describe("Invalid endpoint handler", () => {
       .get("/invalid-endpoint")
       .then((response) => {
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({ msg: "endpoint not found" });
+        expect(response.body).toEqual({ msg: "Endpoint not found" });
       });
   });
 });
@@ -808,14 +808,10 @@ describe("DELETE /api/articles/:article_id", () => {
 });
 describe("DELETE /api/articles/:article_id/comments", () => {
   it("should delete all comments for a given article_id and respond with 204 status", () => {
-    return request(app)
-      .delete(`/api/articles/1/comments`)
-      .expect(204)
+    return request(app).delete(`/api/articles/1/comments`).expect(204);
   });
 
   it("should respond with 404 if the article does not exist", () => {
-  
-
     return request(app)
       .delete(`/api/articles/9999999/comments`)
       .expect(404)
@@ -827,6 +823,93 @@ describe("DELETE /api/articles/:article_id/comments", () => {
   it("should respond with 400 if the article_id is invalid", () => {
     return request(app)
       .delete(`/api/articles/not-an-id/comments`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "invalid input" });
+      });
+  });
+});
+
+describe("POST /api/users/:username/follow-topic", () => {
+  it("allows a user to follow a topic and responds with a success message", () => {
+    return request(app)
+      .post("/api/users/butter_bridge/follow-topic")
+      .send({ topicSlug: "mitch" })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          msg: "User butter_bridge followed topic mitch",
+        });
+      });
+  });
+
+  it("returns 404 if the user does not exist", () => {
+    return request(app)
+      .post("/api/users/nonexistent_user/follow-topic")
+      .send({ topicSlug: "mitch" })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "user not found" });
+      });
+  });
+
+  it("returns 404 if the topic does not exist", () => {
+    return request(app)
+      .post("/api/users/butter_bridge/follow-topic")
+      .send({ topicSlug: "nonexistent_topic" })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "topic not found" });
+      });
+  });
+
+  it("returns 400 if the topicSlug is missing from the request body", () => {
+    return request(app)
+      .post("/api/users/butter_bridge/follow-topic")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "invalid input" });
+      });
+  });
+});
+describe("DELETE /api/users/:username/unfollow-topic", () => {
+  it("allows a user to unfollow a topic and responds with a success message", () => {
+    return request(app)
+      .delete("/api/users/butter_bridge/unfollow-topic")
+      .send({ topicSlug: "mitch" })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          msg: "User butter_bridge unfollowed topic mitch",
+        });
+      });
+  });
+
+  it("returns 404 if the user does not exist", () => {
+    return request(app)
+      .delete("/api/users/nonexistent_user/unfollow-topic")
+      .send({ topicSlug: "mitch" })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "user not found" });
+      });
+  });
+
+  it("returns 404 if the topic does not exist", () => {
+    return request(app)
+      .delete("/api/users/butter_bridge/unfollow-topic")
+      .send({ topicSlug: "nonexistent_topic" })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "topic not found" });
+      });
+  });
+
+  it("returns 400 if the topicSlug is missing from the request body", () => {
+    return request(app)
+      .delete("/api/users/butter_bridge/unfollow-topic")
+      .send({})
       .expect(400)
       .then(({ body }) => {
         expect(body).toEqual({ msg: "invalid input" });
