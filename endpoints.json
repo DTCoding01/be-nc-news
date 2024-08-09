@@ -143,6 +143,13 @@
       }
     }
   },
+  "GET /api/users/:username/followings": {
+    "description": "Serves an object containing arrays of topics and users that the specified user is following.",
+    "exampleResponse": {
+      "topics": ["cooking", "coding"],
+      "users": ["icellusedkars", "weegembump"]
+    }
+  },
   "PATCH /api/comments/:comment_id": {
     "description": "Updates the vote count for the specified comment and returns the updated comment object.",
     "requestBody": {

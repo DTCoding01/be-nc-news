@@ -922,6 +922,7 @@ describe("GET /api/users/:username/followings", () => {
       .get("/api/users/butter_bridge/followings")
       .expect(200)
       .then(({ body }) => {
+        console.log(body, "body")
         expect(body).toHaveProperty('topics');
         expect(body).toHaveProperty('users');
         expect(Array.isArray(body.topics)).toBe(true);
