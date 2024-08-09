@@ -43,8 +43,7 @@ exports.followTopic = (req, res, next) => {
 };
 
 exports.unfollowTopic = (req, res, next) => {
-  const { username } = req.params;
-  const { topicSlug } = req.body;
+  const { username, topicSlug } = req.params;
 
   if (!username || !topicSlug) {
     return res.status(400).send({ msg: "invalid input" });

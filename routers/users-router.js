@@ -17,7 +17,8 @@ usersRouter.get('/', getUsers);
 usersRouter.get('/:username', getUserByUsername);
 
 usersRouter.post('/:username/follow-topic', followTopic);
-usersRouter.delete('/:username/unfollow-topic', unfollowTopic);
+usersRouter.delete('/:username/unfollow-topic/:topicSlug', unfollowTopic);
+
 
 usersRouter.post('/:followerUsername/follow-user', followUser);
 usersRouter.delete('/:followerUsername/unfollow-user', unfollowUser);

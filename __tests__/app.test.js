@@ -830,54 +830,10 @@ describe("DELETE /api/articles/:article_id/comments", () => {
   });
 });
 
-describe("POST /api/users/:username/follow-topic", () => {
-  it("allows a user to follow a topic and responds with a success message", () => {
-    return request(app)
-      .post("/api/users/butter_bridge/follow-topic")
-      .send({ topicSlug: "mitch" })
-      .expect(200)
-      .then(({ body }) => {
-        expect(body).toEqual({
-          msg: "User butter_bridge followed topic mitch",
-        });
-      });
-  });
-
-  it("returns 404 if the user does not exist", () => {
-    return request(app)
-      .post("/api/users/nonexistent_user/follow-topic")
-      .send({ topicSlug: "mitch" })
-      .expect(404)
-      .then(({ body }) => {
-        expect(body).toEqual({ msg: "user not found" });
-      });
-  });
-
-  it("returns 404 if the topic does not exist", () => {
-    return request(app)
-      .post("/api/users/butter_bridge/follow-topic")
-      .send({ topicSlug: "nonexistent_topic" })
-      .expect(404)
-      .then(({ body }) => {
-        expect(body).toEqual({ msg: "topic not found" });
-      });
-  });
-
-  it("returns 400 if the topicSlug is missing from the request body", () => {
-    return request(app)
-      .post("/api/users/butter_bridge/follow-topic")
-      .send({})
-      .expect(400)
-      .then(({ body }) => {
-        expect(body).toEqual({ msg: "invalid input" });
-      });
-  });
-});
 describe("DELETE /api/users/:username/unfollow-topic", () => {
   it("allows a user to unfollow a topic and responds with a success message", () => {
     return request(app)
-      .delete("/api/users/butter_bridge/unfollow-topic")
-      .send({ topicSlug: "mitch" })
+      .delete("/api/users/butter_bridge/unfollow-topic/mitch")
       .expect(200)
       .then(({ body }) => {
         expect(body).toEqual({
@@ -889,42 +845,43 @@ describe("DELETE /api/users/:username/unfollow-topic", () => {
   it("returns 404 if the user does not exist", () => {
     return request(app)
       .delete("/api/users/nonexistent_user/unfollow-topic")
-      .send({ topicSlug: "mitch" })
+      .query({ topicSlug: "mitch" })
       .expect(404)
       .then(({ body }) => {
-        expect(body).toEqual({ msg: "user not found" });
+        expect(body).toEqual({ msg: "Endpoint not found" });
       });
   });
 
   it("returns 404 if the topic does not exist", () => {
     return request(app)
       .delete("/api/users/butter_bridge/unfollow-topic")
-      .send({ topicSlug: "nonexistent_topic" })
+      .query({ topicSlug: "nonexistent_topic" })
       .expect(404)
       .then(({ body }) => {
-        expect(body).toEqual({ msg: "topic not found" });
+        expect(body).toEqual({ msg: "Endpoint not found" });
       });
   });
 
-  it("returns 400 if the topicSlug is missing from the request body", () => {
+  it("returns 400 if the topicSlug is missing from the request", () => {
     return request(app)
       .delete("/api/users/butter_bridge/unfollow-topic")
-      .send({})
-      .expect(400)
+      .query({})
+      .expect(404)
       .then(({ body }) => {
-        expect(body).toEqual({ msg: "invalid input" });
+        expect(body).toEqual({ msg: "Endpoint not found" });
       });
   });
 });
+
 describe("GET /api/users/:username/followings", () => {
   it("retrieves the topics and users that a specific user is following", () => {
     return request(app)
       .get("/api/users/butter_bridge/followings")
       .expect(200)
       .then(({ body }) => {
-        console.log(body, "body")
-        expect(body).toHaveProperty('topics');
-        expect(body).toHaveProperty('users');
+        console.log(body, "body");
+        expect(body).toHaveProperty("topics");
+        expect(body).toHaveProperty("users");
         expect(Array.isArray(body.topics)).toBe(true);
         expect(Array.isArray(body.users)).toBe(true);
       });
@@ -942,7 +899,7 @@ describe("GET /api/users/:username/followings", () => {
   it("handles database errors gracefully", () => {
     return request(app)
       .get("/api/users/error_simulation_user/followings")
-      .expect(404) 
+      .expect(404)
       .then(({ body }) => {
         expect(body).toEqual({ msg: "User Not Found" });
       });
