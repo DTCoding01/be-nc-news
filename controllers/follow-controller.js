@@ -100,8 +100,7 @@ exports.followUser = (req, res, next) => {
 };
 
 exports.unfollowUser = (req, res, next) => {
-  const { followerUsername } = req.params;
-  const { followeeUsername } = req.body;
+  const { followerUsername, followeeUsername } = req.params;
 
   if (!followerUsername || !followeeUsername) {
     return res.status(400).send({ msg: "invalid input" });

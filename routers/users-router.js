@@ -21,7 +21,7 @@ usersRouter.delete('/:username/unfollow-topic/:topicSlug', unfollowTopic);
 
 
 usersRouter.post('/:followerUsername/follow-user', followUser);
-usersRouter.delete('/:followerUsername/unfollow-user', unfollowUser);
+usersRouter.delete('/:followerUsername/unfollow-user/:followeeUsername', unfollowUser);
 usersRouter.get('/:username/followings', getUsersFollowings)
 
 module.exports = usersRouter;
