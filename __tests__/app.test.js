@@ -916,3 +916,34 @@ describe("DELETE /api/users/:username/unfollow-topic", () => {
       });
   });
 });
+describe("GET /api/users/:username/followings", () => {
+  it("retrieves the topics and users that a specific user is following", () => {
+    return request(app)
+      .get("/api/users/butter_bridge/followings")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toHaveProperty('topics');
+        expect(body).toHaveProperty('users');
+        expect(Array.isArray(body.topics)).toBe(true);
+        expect(Array.isArray(body.users)).toBe(true);
+      });
+  });
+
+  it("returns 404 if the user does not exist", () => {
+    return request(app)
+      .get("/api/users/nonexistent_user/followings")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "User Not Found" });
+      });
+  });
+
+  it("handles database errors gracefully", () => {
+    return request(app)
+      .get("/api/users/error_simulation_user/followings")
+      .expect(404) 
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "User Not Found" });
+      });
+  });
+});

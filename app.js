@@ -1,6 +1,5 @@
 const express = require("express");
 const apiRouter = require("./routers/api-router");
-const followRouter = require("./routers/follow-routers.js");
 const {
   handleInvalidInput,
   handleCustomErrors,

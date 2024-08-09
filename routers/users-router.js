@@ -8,7 +8,8 @@ const {
   followTopic,
   unfollowTopic,
   followUser,
-  unfollowUser
+  unfollowUser,
+  getUsersFollowings
 } = require('../controllers/follow-controller'); 
 
 
@@ -20,5 +21,6 @@ usersRouter.delete('/:username/unfollow-topic', unfollowTopic);
 
 usersRouter.post('/:followerUsername/follow-user', followUser);
 usersRouter.delete('/:followerUsername/unfollow-user', unfollowUser);
+usersRouter.get('/:username/followings', getUsersFollowings)
 
 module.exports = usersRouter;

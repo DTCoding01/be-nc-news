@@ -41,3 +41,21 @@ exports.checkTopicExists = (topicSlug) => {
       return result.rows.length > 0;
     });
 };
+
+exports.fetchUserFollowings = (username) => {
+  return Promise.all([
+    db.query(
+      `SELECT topic_slug FROM user_follows_topics WHERE username = $1;`,
+      [username]
+    ),
+    db.query(
+      `SELECT followee_username FROM user_follows_users WHERE follower_username = $1;`,
+      [username]
+    )
+  ]).then(([topicsResult, usersResult]) => {
+    return {
+      topics: topicsResult.rows.map(row => row.topic_slug),
+      users: usersResult.rows.map(row => row.followee_username),
+    };
+  });
+};

@@ -5,6 +5,7 @@ const {
   unfollowUserInDB,
   checkUserExists,
   checkTopicExists,
+  fetchUserFollowings,
 } = require("../models/follow-model");
 
 exports.followTopic = (req, res, next) => {
@@ -92,11 +93,9 @@ exports.followUser = (req, res, next) => {
       return followUserInDB(followerUsername, followeeUsername);
     })
     .then(() => {
-      res
-        .status(200)
-        .send({
-          msg: `User ${followerUsername} followed user ${followeeUsername}`,
-        });
+      res.status(200).send({
+        msg: `User ${followerUsername} followed user ${followeeUsername}`,
+      });
     })
     .catch(next);
 };
@@ -120,11 +119,35 @@ exports.unfollowUser = (req, res, next) => {
       return unfollowUserInDB(followerUsername, followeeUsername);
     })
     .then(() => {
-      res
-        .status(200)
-        .send({
-          msg: `User ${followerUsername} unfollowed user ${followeeUsername}`,
-        });
+      res.status(200).send({
+        msg: `User ${followerUsername} unfollowed user ${followeeUsername}`,
+      });
     })
     .catch(next);
+};
+
+exports.getUsersFollowings = (req, res, next) => {
+  const { username } = req.params;
+
+  if (!username) {
+    return Promise.reject({ msg: "Invalid User" });
+  }
+
+  checkUserExists(username)
+    .then((userExists) => {
+      if (!userExists) {
+        return Promise.reject({ status: 404, msg: "User Not Found" });
+      }
+      return fetchUserFollowings(username);
+    })
+    .then((followings) => {
+      res.status(200).send(followings);
+    })
+    .catch((err) => {
+      if (err.status) {
+        res.status(err.status).send({ msg: err.msg });
+      } else {
+        next(err);
+      }
+    });
 };
